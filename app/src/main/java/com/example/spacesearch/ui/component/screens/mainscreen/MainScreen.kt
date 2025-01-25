@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.spacesearch.R
-import com.example.spacesearch.data.model.entity.ChildData
+import com.example.spacesearch.data.model.entity.PostData
 import com.example.spacesearch.ui.component.SearchBar
 import com.example.spacesearch.ui.theme.Green
 import com.example.spacesearch.viewmodel.MainViewModel
@@ -120,15 +120,17 @@ fun NoResultFoundState() {
 }
 
 @Composable
-fun SearchResultsState(results: List<ChildData>) {
+fun SearchResultsState(results: List<PostData>) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(8.dp)
+        contentPadding = PaddingValues(12.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         items(results) { result ->
             CoilImage(
-                imageModel = { result.data.url },
+                imageModel = { result.url },
                 modifier = Modifier
                     .size(100.dp)
                     .clip(RoundedCornerShape(8.dp)),
