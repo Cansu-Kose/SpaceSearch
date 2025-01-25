@@ -14,10 +14,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,9 +28,10 @@ import com.example.spacesearch.R
 import com.example.spacesearch.ui.theme.Green50
 
 @Composable
-fun SearchBar(searchText: TextFieldValue, onSearch: (TextFieldValue) -> Unit) {
-    var text by remember { mutableStateOf(searchText) }
-
+fun SearchBar(
+    searchText: TextFieldValue,
+    onSearch: (TextFieldValue) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -49,17 +46,19 @@ fun SearchBar(searchText: TextFieldValue, onSearch: (TextFieldValue) -> Unit) {
             contentDescription = "Search",
         )
         Spacer(modifier = Modifier.width(8.dp))
+
         BasicTextField(
-            value = text,
-            onValueChange = {
-                text = it
-                onSearch(it)
-            },
+            value = searchText,
+            onValueChange = { onSearch(it) },
             textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
             modifier = Modifier.weight(1f),
             decorationBox = { innerTextField ->
-                if (text.text.isEmpty()) {
-                    Text(text = "Search", fontSize = 16.sp, color = Color.Gray)
+                if (searchText.text.isEmpty()) {
+                    Text(
+                        text = "Search",
+                        fontSize = 16.sp,
+                        color = Color.Gray
+                    )
                 }
                 innerTextField()
             },
@@ -69,13 +68,13 @@ fun SearchBar(searchText: TextFieldValue, onSearch: (TextFieldValue) -> Unit) {
             ),
             singleLine = true
         )
-        if (text.text.isNotEmpty()) {
+
+        if (searchText.text.isNotEmpty()) {
             Icon(
                 painter = painterResource(id = R.drawable.baseline_clear_24),
                 contentDescription = "Clear",
                 modifier = Modifier.clickable {
-                    text = TextFieldValue("")
-                    onSearch(text)
+                    onSearch(TextFieldValue(""))
                 }
             )
         }

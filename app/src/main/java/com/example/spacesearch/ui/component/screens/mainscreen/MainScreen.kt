@@ -1,6 +1,7 @@
 package com.example.spacesearch.ui.component.screens.mainscreen
 
 import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,11 +28,13 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -49,23 +52,29 @@ import com.skydoves.landscapist.coil.CoilImage
 fun MainScreen(navController: NavController) {
     val viewModel: MainViewModel = hiltViewModel()
 
-    val searchResults by viewModel.searchResults.collectAsState() // now a List<PostData>
+    val searchResults by viewModel.searchResults.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    var searchText by remember { mutableStateOf(TextFieldValue("")) }
+    var searchText by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(""))
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(20.dp))
-        // Trigger a fresh search for newText
-        SearchBar(searchText) { newText ->
-            searchText = newText
-            // If user typed something, start a fresh search => after = null
 
-            viewModel.search(newText.text, "week", 20)
-        }
+        SearchBar(
+            searchText = searchText,
+            onSearch = { newText ->
+                searchText = newText
+
+                if (newText.text.isNotEmpty()) {
+                    viewModel.search(newText.text, "week", 20)
+                }
+            }
+        )
 
         when {
             searchText.text.isEmpty() -> {
@@ -176,19 +185,26 @@ fun SearchResultsState(
                     .size(100.dp)
                     .clip(RoundedCornerShape(8.dp)),
                 loading = {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 },
                 failure = {
-                    Text(
-                        text = "Image failed to load",
-                        color = Color.Red,
-                        modifier = Modifier.align(Alignment.Center)
+                    Image(
+                        painter = painterResource(id = R.drawable.splash_logo),
+                        contentDescription = "Default Image",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Crop
                     )
                 }
             )
         }
 
-        // Show small progress indicator at bottom if currently loading
         if (isLoading) {
             item(span = { GridItemSpan(3) }) {
                 Box(

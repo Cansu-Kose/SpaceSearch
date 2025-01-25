@@ -1,5 +1,7 @@
 package com.example.spacesearch.ui.component.screens.detailscreen
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,9 +16,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.spacesearch.R
 import com.skydoves.landscapist.coil.CoilImage
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -50,10 +55,22 @@ fun DetailScreen(title: String, subreddit: String, imageUrl: String, timestamp: 
                 .height(400.dp)
                 .clip(RoundedCornerShape(12.dp)),
             loading = {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             },
             failure = {
-                Text(text = "Image failed to load", color = Color.Red)
+                Image(
+                    painter = painterResource(id = R.drawable.splash_logo),
+                    contentDescription = "Default Image",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop
+                )
             }
         )
     }
