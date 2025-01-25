@@ -8,6 +8,6 @@ import retrofit2.http.Query
 interface SearchAPIService {
 
     @GET("{keyword}/top.json")
-    suspend fun getTopPosts(@Path("keyword") keyword: String, @Query("raw_json") rawJson: Int = 1, @Query("t") time: String, @Query("limit") limit: Int): RedditResponse
+    suspend fun getTopPosts(@Path("keyword") keyword: String, @Query("raw_json") rawJson: Int = 1, @Query("t") time: String, @Query("limit") limit: Int,@Query("after") after: String): RedditResponse
 
 }

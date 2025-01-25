@@ -15,34 +15,78 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val repo: SearchRepository):ViewModel() {
+class MainViewModel @Inject constructor(
+    private val repo: SearchRepository
+) : ViewModel() {
 
-    private val _search = MutableStateFlow<List<PostData>?>(null)
-    val search: StateFlow<List<PostData>?> get ()= _search.asStateFlow()
+    // All the items loaded so far
+    private val _searchResults = MutableStateFlow<List<PostData>>(emptyList())
+    val searchResults: StateFlow<List<PostData>> = _searchResults.asStateFlow()
 
+    // The next page token from the API
+    private val _after = MutableStateFlow<String?>(null)
+
+    // Loading indicator
     private val _isLoading = MutableStateFlow(false)
-    val isLoading get() = _isLoading.asStateFlow()
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    // Keep track of the current search so we can load more pages
+    private var currentKeyword: String = ""
+    private var currentTime: String = ""
 
-    fun search(keyword: String, time: String, limit: Int) {
+    /**
+     * If after == null => new search (replace old data).
+     * If after != null => load more data (append).
+     */
+    fun search(
+        keyword: String,
+        time: String,
+        limit: Int = 20
+    ) {
+        currentKeyword = keyword
+        currentTime = time
+
         viewModelScope.launch {
-            repo.getTopPosts(keyword,time,limit).onEach {
-                when (it) {
-                    is DataState.Loading -> {
-                        _isLoading.value = true
-                    }
+            repo.getTopPosts(keyword, time, limit, _after.value ?: "null")
+                .onEach { dataState ->
+                    when (dataState) {
+                        is DataState.Loading -> {
+                            _isLoading.value = true
+                        }
+                        is DataState.Success -> {
+                            val result = dataState.data
+                            val newPosts = result.posts
+                            val newAfter = result.after
 
-                    is DataState.Success -> {
-                        _search.value = it.data
-                        _isLoading.value = false
-                    }
+                            if (_after.value == null) {
+                                // Fresh search => Replace old list
+                                _searchResults.value = newPosts
+                            } else {
+                                // Append
+                                _searchResults.value += newPosts
+                            }
 
-                    is DataState.Error -> {
-                        _isLoading.value = false
+                            // Update `_after`
+                            _after.value = newAfter
+                            _isLoading.value = false
+                        }
+                        is DataState.Error -> {
+                            // Handle error
+                            _isLoading.value = false
+                        }
                     }
                 }
-            }.launchIn(viewModelScope)
+                .launchIn(this)
         }
     }
 
+    /**
+     * Load the next page (only if `after` is non-null).
+     */
+    fun loadNextPage() {
+        // If we have no next page or are already loading, do nothing
+        if (_after.value == null || _isLoading.value) return
+
+        _after.value = "null"
+    }
 }

@@ -1,24 +1,29 @@
 package com.example.spacesearch.ui.component.screens.mainscreen
 
 import android.net.Uri
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,36 +48,42 @@ import com.skydoves.landscapist.coil.CoilImage
 @Composable
 fun MainScreen(navController: NavController) {
     val viewModel: MainViewModel = hiltViewModel()
-    val searchResults by viewModel.search.collectAsState()
+
+    val searchResults by viewModel.searchResults.collectAsState() // now a List<PostData>
     val isLoading by viewModel.isLoading.collectAsState()
 
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(20.dp))
+        // Trigger a fresh search for newText
         SearchBar(searchText) { newText ->
             searchText = newText
+            // If user typed something, start a fresh search => after = null
+
             viewModel.search(newText.text, "week", 20)
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         when {
             searchText.text.isEmpty() -> {
                 DefaultSearchState()
             }
-            isLoading -> {
+            isLoading && searchResults.isEmpty() -> {
                 CircularProgressIndicator()
             }
-            searchResults.isNullOrEmpty() -> {
+            searchResults.isEmpty() -> {
                 NoResultFoundState()
             }
             else -> {
-                SearchResultsState(searchResults!!, navController)
+                SearchResultsState(
+                    results = searchResults,
+                    navController = navController,
+                    isLoading = isLoading,
+                    onLoadMore = { viewModel.loadNextPage() }
+                )
             }
         }
     }
@@ -123,7 +134,29 @@ fun NoResultFoundState() {
 }
 
 @Composable
-fun SearchResultsState(results: List<PostData>, navController: NavController) {
+fun SearchResultsState(
+    results: List<PostData>,
+    navController: NavController,
+    isLoading: Boolean,
+    onLoadMore: () -> Unit
+) {
+    val listState = rememberLazyGridState()
+
+    // If we scrolled to the last item -> load more
+    val shouldLoadMore = remember {
+        derivedStateOf {
+            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+            lastVisible != null && lastVisible >= results.size - 1
+        }
+    }
+
+    // Whenever shouldLoadMore changes to true, load next page if not already loading
+    LaunchedEffect(shouldLoadMore.value) {
+        if (shouldLoadMore.value && !isLoading) {
+            onLoadMore()
+        }
+    }
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         modifier = Modifier.fillMaxSize(),
@@ -153,6 +186,18 @@ fun SearchResultsState(results: List<PostData>, navController: NavController) {
                     )
                 }
             )
+        }
+
+        // Show small progress indicator at bottom if currently loading
+        if (isLoading) {
+            item(span = { GridItemSpan(3) }) {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
         }
     }
 }

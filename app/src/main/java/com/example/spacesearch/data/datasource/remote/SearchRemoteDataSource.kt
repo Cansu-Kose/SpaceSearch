@@ -15,7 +15,8 @@ class SearchRemoteDataSource @Inject constructor(
     private val apiService: SearchAPIService,
     private val keyword: String,
     private val time: String,
-    private val limit: Int
+    private val limit: Int,
+    private val after: String
 ) : PagingSource<Int, PostData>() {
 
     override fun getRefreshKey(state: PagingState<Int, PostData>): Int? {
@@ -25,7 +26,7 @@ class SearchRemoteDataSource @Inject constructor(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PostData> {
         return try {
             val nextPage = params.key ?: 1
-            val response = apiService.getTopPosts(keyword, nextPage, time, limit)
+            val response = apiService.getTopPosts(keyword, nextPage, time, limit,after)
 
             val posts = response.data.children.map { it.postData } // Extract list of PostData
 

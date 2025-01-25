@@ -1,4 +1,4 @@
-package com.example.spacesearch.ui.component.screens.mainscreen
+package com.example.spacesearch.ui.component.screens.detailscreen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
