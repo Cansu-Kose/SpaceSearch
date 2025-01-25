@@ -3,7 +3,7 @@ package com.example.spacesearch
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.example.spacesearch.ui.component.screens.mainscreen.MainScreen
+import com.example.spacesearch.navigation.AppNavigation
 import com.example.spacesearch.ui.theme.SpaceSearchTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -16,7 +16,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             SpaceSearchTheme {
-                MainScreen()
+                AppNavigation()
             }
         }
 

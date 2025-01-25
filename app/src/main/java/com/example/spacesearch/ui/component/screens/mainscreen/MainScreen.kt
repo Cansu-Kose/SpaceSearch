@@ -1,6 +1,8 @@
 package com.example.spacesearch.ui.component.screens.mainscreen
 
+import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -30,6 +32,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.spacesearch.R
 import com.example.spacesearch.data.model.entity.PostData
 import com.example.spacesearch.ui.component.SearchBar
@@ -38,14 +41,14 @@ import com.example.spacesearch.viewmodel.MainViewModel
 import com.skydoves.landscapist.coil.CoilImage
 
 @Composable
-fun MainScreen() {
+fun MainScreen(navController: NavController) {
     val viewModel: MainViewModel = hiltViewModel()
     val searchResults by viewModel.search.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    var searchText by remember  { mutableStateOf(TextFieldValue("")) }
+    var searchText by remember { mutableStateOf(TextFieldValue("")) }
 
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White),
@@ -69,7 +72,7 @@ fun MainScreen() {
                 NoResultFoundState()
             }
             else -> {
-                SearchResultsState(searchResults!!)
+                SearchResultsState(searchResults!!, navController)
             }
         }
     }
@@ -120,7 +123,7 @@ fun NoResultFoundState() {
 }
 
 @Composable
-fun SearchResultsState(results: List<PostData>) {
+fun SearchResultsState(results: List<PostData>, navController: NavController) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         modifier = Modifier.fillMaxSize(),
@@ -132,6 +135,11 @@ fun SearchResultsState(results: List<PostData>) {
             CoilImage(
                 imageModel = { result.url },
                 modifier = Modifier
+                    .clickable {
+                        navController.navigate(
+                            "detail/${Uri.encode(result.title)}/${Uri.encode(result.subredditNamePrefixed)}/${Uri.encode(result.url)}/${result.createdUtc}"
+                        )
+                    }
                     .size(100.dp)
                     .clip(RoundedCornerShape(8.dp)),
                 loading = {
