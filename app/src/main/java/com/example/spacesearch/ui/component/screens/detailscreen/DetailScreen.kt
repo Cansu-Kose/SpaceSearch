@@ -28,22 +28,22 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun DetailScreen(title: String, subreddit: String, imageUrl: String, timestamp: Double) {
+fun DetailScreen(title: String?, subreddit: String?, imageUrl: String?, timestamp: Double?) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
         Text(
-            text = title,
+            text = title ?: "",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = subreddit, fontSize = 16.sp, color = Color.Gray)
+        Text(text = subreddit ?: "", fontSize = 16.sp, color = Color.Gray)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Posted on: ${convertUtcToDate(timestamp)}",
+            text = "Posted on: ${convertUtcToDate(timestamp?.toDouble() ?: 0.0)}",
             fontSize = 14.sp,
             color = Color.DarkGray
         )

@@ -175,11 +175,15 @@ fun SearchResultsState(
     ) {
         items(results) { result ->
             CoilImage(
-                imageModel = { result.url },
+                imageModel = { result.url ?: ""},
                 modifier = Modifier
                     .clickable {
+                        val subreddit:String= result.subredditNamePrefixed ?: ""
+                        val url:String = result.url ?: ""
+                        val title:String = result.title ?: ""
+                        val createdUtc:String = result.createdUtc.toString()
                         navController.navigate(
-                            "detail/${Uri.encode(result.title)}/${Uri.encode(result.subredditNamePrefixed)}/${Uri.encode(result.url)}/${result.createdUtc}"
+                            "detail/${Uri.encode(title)}/${Uri.encode(subreddit)}/${Uri.encode(url)}/${createdUtc}"
                         )
                     }
                     .size(100.dp)
