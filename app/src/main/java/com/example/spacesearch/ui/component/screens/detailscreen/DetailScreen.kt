@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -38,11 +37,14 @@ fun DetailScreen(title: String?, subreddit: String?, imageUrl: String?, timestam
         Text(
             text = title ?: "",
             fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.testTag("DetailTitle")
+            fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = subreddit ?: "", fontSize = 16.sp, color = Color.Gray)
+        Text(
+            text = subreddit ?: "",
+            fontSize = 16.sp,
+            color = Color.Gray
+        )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "Posted on: ${convertUtcToDate(timestamp ?: 0.0)}",
@@ -51,7 +53,7 @@ fun DetailScreen(title: String?, subreddit: String?, imageUrl: String?, timestam
         )
         Spacer(modifier = Modifier.height(16.dp))
         CoilImage(
-            imageModel = { imageUrl },
+            imageModel = { imageUrl ?: "" },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(400.dp)

@@ -35,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -187,7 +186,6 @@ fun SearchResultsState(
             CoilImage(
                 imageModel = { result.url ?: ""},
                 modifier = Modifier
-                    .testTag("SearchBar")
                     .clickable {
                         val subreddit:String= result.subredditNamePrefixed ?: ""
                         val url:String = result.url ?: ""
@@ -198,7 +196,6 @@ fun SearchResultsState(
                         )
                     }
                     .size(100.dp)
-                    .testTag("SearchResultItem")
                     .clip(RoundedCornerShape(8.dp)),
                 loading = {
                     Box(

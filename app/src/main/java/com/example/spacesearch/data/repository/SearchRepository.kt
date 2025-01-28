@@ -19,9 +19,8 @@ class SearchRepository @Inject constructor(private val apiService: SearchAPIServ
         try {
             val apiResponse = apiService.getTopPosts(keyword, rawJson = 1, time, limit, after)
             val posts = apiResponse.data.children.map { it.postData }
-            val afterVal = apiResponse.data.after // important!
+            val afterVal = apiResponse.data.after
 
-            // Return both posts + after
             emit(DataState.Success(PostsResult(posts, afterVal)))
         } catch (e: Exception) {
             emit(DataState.Error(e))

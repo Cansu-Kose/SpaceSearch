@@ -97,6 +97,14 @@ dependencies {
     androidTestImplementation(libs.mockk.agent)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.viewmodel)
+    implementation(libs.coroutines.core)
+    implementation(libs.coroutines.test)
+    implementation(libs.mockk)
+    implementation(libs.turbine)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 
     // Additional libraries
     implementation(libs.androidx.constraintlayout.compose)
