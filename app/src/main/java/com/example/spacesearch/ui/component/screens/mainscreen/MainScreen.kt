@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -46,6 +47,9 @@ import com.example.spacesearch.data.model.entity.PostData
 import com.example.spacesearch.ui.component.SearchBar
 import com.example.spacesearch.ui.theme.Green
 import com.example.spacesearch.viewmodel.MainViewModel
+import com.google.firebase.Firebase
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.remoteConfig
 import com.skydoves.landscapist.coil.CoilImage
 
 @Composable
@@ -59,6 +63,9 @@ fun MainScreen(navController: NavController) {
         mutableStateOf(TextFieldValue(""))
     }
 
+    val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
+    val tParameter: String = remoteConfig.getString("t_parameter")
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -68,10 +75,13 @@ fun MainScreen(navController: NavController) {
         SearchBar(
             searchText = searchText,
             onSearch = { newText ->
-                searchText = newText
+                if(searchText.text != newText.text) {
+                    searchText = newText
 
-                if (newText.text.isNotEmpty()) {
-                    viewModel.search(newText.text, "week", 20)
+                    if (newText.text.isNotEmpty()) {
+
+                        viewModel.search(newText.text, tParameter, 20)
+                    }
                 }
             }
         )
@@ -177,6 +187,7 @@ fun SearchResultsState(
             CoilImage(
                 imageModel = { result.url ?: ""},
                 modifier = Modifier
+                    .testTag("SearchBar")
                     .clickable {
                         val subreddit:String= result.subredditNamePrefixed ?: ""
                         val url:String = result.url ?: ""
@@ -187,6 +198,7 @@ fun SearchResultsState(
                         )
                     }
                     .size(100.dp)
+                    .testTag("SearchResultItem")
                     .clip(RoundedCornerShape(8.dp)),
                 loading = {
                     Box(

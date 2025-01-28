@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.room)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -55,9 +55,15 @@ android {
         compose = true
         buildConfig = true
     }
-
-    room {
-        schemaDirectory("$projectDir/schemas")
+    packaging {
+        resources.excludes.addAll(
+            listOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md")
+        )
+    }
+    defaultConfig {
+        testInstrumentationRunner = "com.example.spacesearch.hilt.HiltTestRunner"
     }
 }
 
@@ -74,6 +80,7 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.firebase.config)
 
     // Testing dependencies
     testImplementation(libs.junit)
@@ -81,6 +88,13 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.hilt.android.testing)
+    testImplementation(libs.hilt.android.testing)
+    testImplementation(libs.mockk.android)
+    testImplementation(libs.mockk.agent)
+    kspAndroidTest(libs.hilt.compiler)
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.mockk.agent)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
@@ -109,11 +123,5 @@ dependencies {
 
     // Logger
     implementation(libs.timber)
-
-    // Room database
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
-    ksp(libs.room.compiler)
-    annotationProcessor(libs.room.compiler)
 
 }

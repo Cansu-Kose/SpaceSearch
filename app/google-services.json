@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "173197276150",
+    "project_id": "spacesearch-8e7af",
+    "storage_bucket": "spacesearch-8e7af.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:173197276150:android:20582be0b505fb1937cdd7",
+        "android_client_info": {
+          "package_name": "com.example.spacesearch"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8hE_kSSzMQiWoLUu-P0F6ewpvj4MWmPY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

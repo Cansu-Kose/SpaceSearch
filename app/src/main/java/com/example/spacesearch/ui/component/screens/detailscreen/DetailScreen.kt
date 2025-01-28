@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,13 +38,14 @@ fun DetailScreen(title: String?, subreddit: String?, imageUrl: String?, timestam
         Text(
             text = title ?: "",
             fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.testTag("DetailTitle")
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = subreddit ?: "", fontSize = 16.sp, color = Color.Gray)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Posted on: ${convertUtcToDate(timestamp?.toDouble() ?: 0.0)}",
+            text = "Posted on: ${convertUtcToDate(timestamp ?: 0.0)}",
             fontSize = 14.sp,
             color = Color.DarkGray
         )

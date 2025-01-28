@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -49,10 +50,18 @@ fun SearchBar(
 
         BasicTextField(
             value = searchText,
-            onValueChange = { onSearch(it) },
+            onValueChange = { newValue ->
+                val filteredText = newValue.text.filter { it.isLowerCase() && it.isLetter() }
+                if (filteredText == newValue.text) {
+                    onSearch(newValue)
+                } else {
+                    onSearch(TextFieldValue(filteredText))
+                }
+            },
             textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
-            modifier = Modifier.weight(1f),
-            decorationBox = { innerTextField ->
+            modifier = Modifier
+                .weight(1f)
+                .testTag("SearchTextField"), decorationBox = { innerTextField ->
                 if (searchText.text.isEmpty()) {
                     Text(
                         text = "Search",

@@ -1,18 +1,16 @@
 package com.example.spacesearch
 
-import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import com.example.spacesearch.navigation.AppNavigation
 import com.example.spacesearch.ui.theme.SpaceSearchTheme
+import com.google.firebase.Firebase
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.remoteConfig
+import com.google.firebase.remoteconfig.remoteConfigSettings
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -24,24 +22,23 @@ class MainActivity : ComponentActivity() {
         setContent {
             SpaceSearchTheme {
                 AppNavigation()
-                SetPortraitOrientationOnly()
             }
         }
+
+        val remoteConfig: FirebaseRemoteConfig = Firebase.remoteConfig
+        val configSettings = remoteConfigSettings {
+            minimumFetchIntervalInSeconds = 3600
+        }
+        remoteConfig.setConfigSettingsAsync(configSettings)
+        remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults)
+        remoteConfig.fetchAndActivate()
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    val updated = task.result
+                    Timber.tag("remoteConfig").d("Config params updated: $updated")
+                }
+            }
 
     }
 }
 
-fun Context.findActivity(): Activity? = when (this) {
-    is Activity -> this
-    is ContextWrapper -> baseContext.findActivity()
-    else -> null
-}
-
-@SuppressLint("SourceLockedOrientationActivity")
-@Composable
-fun SetPortraitOrientationOnly() {
-    val context = LocalContext.current
-    val activity = context.findActivity()
-
-    activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-}
